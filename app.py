@@ -41,21 +41,21 @@ def review():
     return render_template('review_form.html')
 
 
-@app.route("/review", methods=['PUT', 'POST', 'GET'])
+@app.route("/review", methods=['POST'])
 def review_post():
     product_id = request.form['id']
     title = request.form['title']
-    new_review = request.form['review']
+    review = request.form['review']
 
     product_details = ProductDetails.query.get(product_id)
     asin = product_details.asin
 
-    new_review = ProductReviews(product_id=product_id, asin=asin, title=title, review=new_review)
+    new_review = ProductReviews(product_id=product_id, asin=asin, title=title, review=review)
     db.session.add(new_review)
     db.session.commit()
 
-    logger.debug('review has been added: {}'.format(review))
-    return 200, review
+    logger.debug('review has been added: {}'.format(new_review))
+    return jsonify(new_review.serialize())
 
 
 if __name__ == '__main__':
