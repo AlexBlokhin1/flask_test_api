@@ -1,10 +1,13 @@
 import os
 
 from flask import Flask, request, jsonify, render_template
+import logging
 
 import commands
 import database
 from models import ProductDetails, ProductReviews
+logger = logging.getLogger(__name__)
+
 
 app = Flask(__name__)
 
@@ -25,7 +28,10 @@ def get_product_details(id):
     product_details = ProductDetails.query.get(id)
     product_reviews = ProductReviews.query.filter_by(product_id=id).all()
     list_reviews = [x.review for x in product_reviews]
-    return jsonify({"asin": product_details.asin, "title": product_details.title, "reviews": list_reviews})
+    result = {"asin": product_details.asin, "title": product_details.title, "reviews": list_reviews}
+
+    logger.debug('information by id {}: {}'.format(id, result))
+    return jsonify(result)
 
 
 @app.route('/review')
@@ -44,6 +50,8 @@ def review_post():
     new_review = ProductReviews(product_id=product_id, asin=asin, title=title, review=review)
     database.db.session.add(new_review)
     database.db.session.commit()
+
+    logger.debug('review has been added: {}'.format(review))
     return "review has been added"
 
 
