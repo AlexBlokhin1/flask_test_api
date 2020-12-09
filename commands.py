@@ -1,4 +1,4 @@
-from csv_utils import get_dict_data, get_dict_data_2
+from csv_utils import load_from_csv
 from database import db
 from models import ProductDetails, ProductReviews
 
@@ -16,21 +16,10 @@ def create_model_table():
 
 
 def init_app(app):
-    # add multiple commands in a bulk
     for command in [create_db, drop_db, create_model_table, prepopulate]:
         app.cli.add_command(app.cli.command()(command))
 
 
 def prepopulate():
-    data = get_dict_data("static/products.csv")
-    for i in data.items():
-        details = ProductDetails(asin=i[0], title=i[1])
-        db.session.add(details)
-    db.session.commit()
-
-    data = get_dict_data_2("static/reviews.csv")
-    for i in data.items():
-        product_id = db.session.query(ProductDetails).filter_by(asin=i[1][0]).first().id
-        details = ProductReviews(asin=i[1][0], title=i[0], review=i[1][1], product_id=product_id)
-        db.session.add(details)
-    db.session.commit()
+    ProductDetails.map_save_bulk(load_from_csv("static/products.csv"))
+    ProductReviews.map_save_bulk(load_from_csv("static/reviews.csv"))
