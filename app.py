@@ -26,12 +26,9 @@ def create_tables():
 
 @app.route("/<int:id>", methods=['GET'])
 def get_product_details(id):
-    print(id)
     product_details = ProductDetails.query.get(id)
-    product_reviews = ProductReviews.query.filter_by(product_id=id).all()
-    list_reviews = [x.review for x in product_reviews]
-    result = {"asin": product_details.asin, "title": product_details.title, "reviews": list_reviews}
-
+    product_reviews = ProductReviews.query.get(id).review
+    result = {"asin": product_details.asin, "title": product_details.title, "reviews": product_reviews}
     logger.debug('information by id {}: {}'.format(id, result))
     return jsonify(result)
 
