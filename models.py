@@ -17,10 +17,6 @@ class ProductDetails(db.Model):
             db.session.add(details)
         db.session.commit()
 
-    def __init__(self, title, asin):
-        self.asin = asin
-        self.title = title
-
     def __repr__(self):
         return '<id {}>'.format(self.id)
 
@@ -38,7 +34,6 @@ class ProductReviews(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('product_details.id'))
     product = relationship("ProductDetails")
-    asin = db.Column(db.String())
     title = db.Column(db.String())
     review = db.Column(db.String())
 
@@ -49,12 +44,6 @@ class ProductReviews(db.Model):
             details = cls(product_id=product_id, **el)
             db.session.add(details)
         db.session.commit()
-
-    def __init__(self, product_id, title, asin, review):
-        self.product_id = product_id
-        self.asin = asin
-        self.title = title
-        self.review = review
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
